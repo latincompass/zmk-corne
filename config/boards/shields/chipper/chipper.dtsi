@@ -1,7 +1,3 @@
-zmk-corne/config/boards/shields/chipper
-/chipper.dtsi
-
-
 
 #include <dt-bindings/zmk/matrix_transform.h>
 
