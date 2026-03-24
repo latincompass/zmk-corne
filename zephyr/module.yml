@@ -2,5 +2,4 @@
 build:
   settings:
     board_root: .
-  cmake:
-    - "-DZMK_BOARD_VARIANT=xiao_ble"  # 显式指定新版板卡变体
+# 完全删除 cmake 相关行（手动指定 ZMK_BOARD_VARIANT 会触发格式错误）
