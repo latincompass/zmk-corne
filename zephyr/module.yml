@@ -1,3 +1,6 @@
+# zmk-corne-main/zephyr/module.yml
 build:
   settings:
     board_root: .
+  cmake:
+    - "-DZMK_BOARD_VARIANT=xiao_ble"  # 显式指定新版板卡变体
