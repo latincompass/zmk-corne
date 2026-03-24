@@ -1,82 +1,143 @@
-Run west build -s zmk/app -d "/tmp/tmp.qwyQugwHpj" -b "xiao_ble//zmk"  -- -DZMK_CONFIG=/tmp/zmk-config/config -DSHIELD="chipper_left" -DZMK_EXTRA_MODULES='/__w/zmk-corne/zmk-corne' 
-+ west build -s zmk/app -d /tmp/tmp.qwyQugwHpj -b xiao_ble//zmk -- -DZMK_CONFIG=/tmp/zmk-config/config -DSHIELD=chipper_left -DZMK_EXTRA_MODULES=/__w/zmk-corne/zmk-corne
--- west build: generating a build system
-Loading Zephyr default modules (Zephyr base).
--- Application: /tmp/zmk-config/zmk/app
--- CMake version: 3.31.6
--- Found Python3: /usr/bin/python3 (found suitable version "3.12.3", minimum required is "3.10") found components: Interpreter
--- Cache files will be written to: /tmp/zmk-config/zephyr/.cache
--- Zephyr version: 4.1.0 (/tmp/zmk-config/zephyr)
--- Found west (found suitable version "1.5.0", minimum required is "0.14.0")
-CMake Deprecation Warning at keymap-module/modules/modules.cmake:53 (message):
-  The `config/boards` folder is deprecated.  Please use a module instead.
-  See https://zmk.dev/docs/development/hardware-integration/new-shield and
-  https://zmk.dev/docs/development/module-creation for more information.
-Call Stack (most recent call first):
-  /tmp/zmk-config/zephyr/cmake/modules/zephyr_module.cmake:126 (include)
-  /tmp/zmk-config/zephyr/cmake/modules/zephyr_default.cmake:134 (include)
-  /tmp/zmk-config/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)
-  /tmp/zmk-config/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)
-  CMakeLists.txt:9 (find_package)
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/outputs.h>
 
+#define XXX &none
+#define ___ &trans
 
--- Adding ZMK config directory as board root: /tmp/zmk-config/config
-CMake Warning at /tmp/zmk-config/zephyr/cmake/modules/boards.cmake:136 (message):
-  BOARD_ROOT element without a 'boards' subdirectory:
+#define COMBO_TIMEOUT 60
 
-  /__w/zmk-corne/zmk-corne
+#define DEF 0
+#define NAV 1
+#define FN 2
+#define NUM 3
+#define SYS 4
 
-  Hints:
+/ {
+    macros {
+	nayeon: nayeon {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings
+                = <&macro_tap_time 10>
+		,<&macro_tap &kp N &kp A &kp Y &kp E &kp O &kp N &kp RET>;
+        };
+    };
+};
 
-    - if your board directory is '/foo/bar/boards/my_board' then add '/foo/bar' to BOARD_ROOT, not the entire board directory
-    - if in doubt, use absolute paths
-Call Stack (most recent call first):
-  /tmp/zmk-config/zephyr/cmake/modules/zephyr_default.cmake:134 (include)
-  /tmp/zmk-config/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)
-  /tmp/zmk-config/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)
-  CMakeLists.txt:9 (find_package)
+/ {
+    combos {
+        compatible = "zmk,combos";
+	 combo_cw {
+            timeout-ms = <COMBO_TIMEOUT>;
+            key-positions = <6 30>;
+            bindings = <&nayeon>;
+        };
+    };
+};
 
+/ {
+        bht: balanced_hold_taps {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            tapping-term-ms = <280>;    // <---[[moderate duration]]
+            flavor = "balanced";
+            bindings = <&kp>, <&kp>;
+            quick-tap-ms = <175>;       // repeat on tap-into-hold
+            require-prior-idle-ms = <150>;
+        };
+    };
+/ {
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+        tri_layer {
+            if-layers = <1 2>;
+            then-layer = <4>;
+        };
+    };
+};
 
--- Board: xiao_ble, qualifiers: nrf52840/zmk
--- Shield(s): chipper_left
-Checking /__w/zmk-corne/zmk-corne
-Checking /tmp/zmk-config/zmk/app/module
-Checking /tmp/zmk-config/zmk/app
-found /tmp/zmk-config/zmk/app
--- ZMK Config directory: /tmp/zmk-config/config
--- ZMK Config Kconfig: /tmp/zmk-config/config/chipper.conf
-xiao_ble_nrf52840_zmk for _nrf52840_zmk for xiao_ble with version 
--- ZMK Config Kconfig: /tmp/zmk-config/config/chipper.conf
--- Using keymap file: /tmp/zmk-config/config/chipper.keymap
-Checking /tmp/zmk-config/config
--- Using keymap file: /tmp/zmk-config/config/chipper.keymap
-Checking /tmp/zmk-config/zephyr
--- ZEPHYR_TOOLCHAIN_VARIANT not set, trying to locate Zephyr SDK
--- Found host-tools: zephyr 0.16.9 (/opt/zephyr-sdk-0.16.9)
--- Found toolchain: zephyr 0.16.9 (/opt/zephyr-sdk-0.16.9)
--- Found Dtc: /opt/zephyr-sdk-0.16.9/sysroots/x86_64-pokysdk-linux/usr/bin/dtc (found suitable version "1.6.0", minimum required is "1.4.6")
--- Found BOARD.dts: /tmp/zmk-config/zmk/app/boards/seeed/xiao_ble/xiao_ble_zmk.dts
--- Found devicetree overlay: /tmp/zmk-config/config/boards/shields/chipper/chipper_left.overlay
--- Found devicetree overlay: /tmp/zmk-config/config/chipper.keymap
-devicetree error: /tmp/zmk-config/config/boards/shields/chipper/chipper.dtsi:1 (column 1): parse error: expected '/' or label reference (&foo)
-CMake Error at /tmp/zmk-config/zephyr/cmake/modules/dts.cmake:303 (execute_process):
-  execute_process failed command indexes:
+/ {
+        keymap {
+                compatible = "zmk,keymap";
 
-    1: "Child return code: 1"
+                DEF_layer {
+                        display-name = "Base";
+                        bindings = <
+            //╭──────╮ ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮ ╭──────╮
+&bht LS(LC(LALT)) ESC  &bht LS(LC(LALT)) Q   &kp W    &kp E         &kp R         &kp T             &kp Y         &kp U         &bht PIPE I   &kp O         &lt FN P      &kp DEL
+            //├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼──────|──────┼─────────────┼─────────────┤ ├──────┤
+&bht LS(LC(LA(LGUI))) TAB   &bht LG(A) A     &kp S    &kp D      &bht LG(F) F     &kp G            &bht HASH H    &kp J         &kp K         &kp L         &kp RET       &kp RA(RET)
+            //├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├──────#──────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────┤
+&bht LCTRL BSPC    &lt FN Z    &bht LG(X) X   &bht LG(C) C   &bht LG(V) V  &bht LS(LC(LA(V))) B     &kp N         &kp M       &bht SEMI COMMA &bht COLON DOT &bht SQT QMARK  &kp RALT
+            //├──────┤ ╰─────────────┼─────────────┴─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┴───────────────────────────╯ ├──────┤
+                                                    &kp LSHFT      &sk LGUI      &lt NAV SPC       &lt NUM SPC    &kp BSPC    &bht RS(RC(RA(RGUI))) RS(RC(RA(H)))
+             //                                    ╰────────────┼──────────────┴─────────────╯   ╰─────────────┴─────────────┼─────────────╯
+                        >;
+                };
 
-Call Stack (most recent call first):
-  /tmp/zmk-config/zephyr/cmake/modules/zephyr_default.cmake:134 (include)
-  /tmp/zmk-config/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)
-  /tmp/zmk-config/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)
-  CMakeLists.txt:9 (find_package)
+                
 
+                NAV_layer {
+                        display-name = "Navigation";
+                        bindings = <
+//╭──────╮ ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮ ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮ ╭──────╮
+    ___      &kp ESC       &kp LS(LC(TAB)) &kp UP      &kp LC(TAB)    &kp LG(TAB)      &kp FSLH     &kp UNDER     &kp PIPE       ___           ___           ___
+//├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼───toggle────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────┤
+    ___      &kp TAB       &kp LEFT      &kp DOWN      &kp RIGHT       ___             &kp HASH     &kp DLLR      &kp DOWN      &kp RIGHT      ___           ___
+//├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────┤
+    ___      ___            ___           ___           ___            ___             &kp AMPS      ___           ___           ___           ___           ___
+//├──────┤ ╰─────────────┼─────────────┴─────────────┼─────────────┼─────────────┤ ├─────────────┼─────────────┼─────────────┴───────────────────────────╯ ├──────┤
+                                          ___           ___            ___             ___           ___          ___
+//                                      ╰────────────╰─────────────┴─────────────╯ ╰─────────────┴─────────────╯─────────────╯                                           
+                        >;
+                };
 
--- Configuring incomplete, errors occurred!
-FATAL ERROR: command exited with status 1: /usr/local/bin/cmake -DWEST_PYTHON=/usr/bin/python3 -B/tmp/tmp.qwyQugwHpj -GNinja -DBOARD=xiao_ble//zmk -DZMK_CONFIG=/tmp/zmk-config/config -DSHIELD=chipper_left -DZMK_EXTRA_MODULES=/__w/zmk-corne/zmk-corne -S/tmp/zmk-config/zmk/app
-Error: Process completed with exit code 1.
-0s
-2s
-Run if ! (grep "CONFIG_ZMK_BOARD_COMPAT=y" "/tmp/tmp.qwyQugwHpj/zephyr/.config" > /dev/null)
-grep: /tmp/tmp.qwyQugwHpj/zephyr/.config: No such file or directory
-Error: The selected board is not set up for ZMK and there is a ZMK variant available. See https://zmk.dev/blog/2025/12/09/zephyr-4-1#zmk-board-variant.
-Error: Process completed with exit code 1.
+                FN_layer {
+                        display-name = "Function, F key";
+                        bindings = <
+//╭──────╮ ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮ ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮ ╭──────╮
+    ___        ___         ___           ___           ___          ___              ___            &kp F7        &kp F8        &kp F9         &kp F12       ___
+//├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────┤
+    ___        ___         ___           ___           ___          ___              ___            &kp F4        &kp F5        &kp F6         &kp F11       ___
+//├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────┤
+    ___        ___         ___           ___           ___          ___              ___            &kp F1        &kp F2        &kp F3         &kp F10       ___
+//├──────┤ ╰─────────────┼─────────────┴─────────────┼─────────────┼─────────────┤ ├─────────────┼─────────────┼─────────────┴───────────────────────────╯ ├──────┤
+                                               ___        ___           ___            ___           ___           ___                                       
+//                                           ╰──────╯╰─────────────┴─────────────╯ ╰─────────────┴─────────────╯╰──────╯                                           
+                        >;
+		};
+		
+		        NUM_layer {
+                        display-name = "Number, Symbol";
+                        bindings = <
+//╭──────╮ ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮ ╭──────────────┬──────────────┬─────────────┬─────────────┬─────────────╮ ╭──────╮
+    ___     &bht DQT QMARK &kp LT        &kp DLLR      &kp GT        &kp BSLH       &bht EXCL EQUAL  &bht PLUS N7 &bht MINUS N8 &bht UNDER N9  &kp RG(P)     ___
+//├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────=!──────┼──────7+──────┼─────8-──────┼─────9_──────┼─────────────┤ ├──────┤
+    ___     &kp AT         &kp LPAR      &kp AMPS      &kp RPAR      &kp GRAVE      &bht HASH KP_DOT &bht STAR N4 &bht FSLH N5  &bht BSLH N6  ___           ___
+//├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────.#──────┼─────4*───────┼──────5/─────┼──────6\─────┼─────────────┤ ├──────┤
+    ___     &kp TILDE      &kp LBKT      &kp CARET     &kp RBKT      ___            &bht PRCNT N0   &bht PIPE N1   &bht AMPS N2  &bht HASH N3  ___           ___
+//├──────┤ ╰─────────────┼─────────────┴─────────────┼─────────────┼─────────────┤ ├──────0%──────┼──────1|──────┼─────2&──────┼──────3#──────┼─────────────╯ ╰──────╯
+                                         ___           ___           ___             ___           &kp DEL        ___                                    
+//                                     ╰─────────────┴─────────────┴─────────────╯ ╰──────────────┴──────────────┼─────────────╯                                     
+                        >;
+		};
+
+                        		SYS_layer {
+                        display-name = "Bluetooth, Reset";
+                        bindings = <
+//╭──────╮ ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮ ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮ ╭──────╮
+    ___    &bt BT_SEL 0   &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3   &bt BT_CLR       &bt BT_CLR    &bt BT_SEL 0  ___           ___           ___             ___
+//├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────┤
+    ___     &kp A         ___           ___           ___            &bootloader      &bootloader   ___           ___           ___           &kp A           ___
+//├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────┤
+    ___     ___           ___           ___           ___            &sys_reset       &sys_reset    ___           ___           ___           ___             ___
+//├──────┤ ╰─────────────┼─────────────┴─────────────┼─────────────┼─────────────┤ ├─────────────┼─────────────┼─────────────┴───────────────────────────╯ ├──────┤
+    ___                                                ___           ___              ___           ___                                                       ___
+//╰──────╯                                           ╰─────────────┴─────────────╯ ╰─────────────┴─────────────╯                                           ╰──────╯
+                        >;
+		};
+
+        };
+};
