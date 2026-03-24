@@ -1,5 +1,11 @@
 # **ZMK Firmware for Corne Keyboard (XIAO BLE)**
 
+
+个人重新重置的程序，运行终于成功了，可以把生成的UF2下载
+
+
+
+
 This repository contains a customized **[ZMK firmware](https://zmk.dev/docs)** for the **Corne split keyboard**(42 keys) powered by **[Seeed Studio XIAO BLE](https://wiki.seeedstudio.com/XIAO_BLE/)**. It includes a custom keymap, multiple layers, and Bluetooth multi-device support.
 
 ## **Features**
